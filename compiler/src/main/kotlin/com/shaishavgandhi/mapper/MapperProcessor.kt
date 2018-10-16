@@ -2,6 +2,7 @@ package com.shaishavgandhi.mapper
 
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier.VARARG
@@ -79,8 +80,12 @@ class MapperProcessor: AbstractProcessor() {
 
       val nameResolver = metaData.data.nameResolver
 
+      val codeBlockBuilder = CodeBlock.builder().add("return ${classValue?.asTypeName()}(")
       proto.constructorList.map {
         it.valueParameterList.map {
+          val name = nameResolver.getString(it.name)
+
+          codeBlockBuilder.addStatement("$name = $name,")
           messager.printMessage(WARNING, "${nameResolver.getString(it.name)} ${nameResolver.getString(it.type.className)}")
         }
       }
@@ -88,9 +93,10 @@ class MapperProcessor: AbstractProcessor() {
         messager.printMessage(WARNING, nameResolver.getString(it.name))
       }
 
-      file.addFunction(FunSpec.builder("to$name")
+      file.addFunction(FunSpec.builder("to${element.simpleName}")
           .receiver(element.asType().asTypeName())
-//          .returns(classValue?.asTypeName()!!)
+          .returns(classValue?.asTypeName()!!)
+          .addCode(codeBlockBuilder.build())
           .build())
       file.build().writeTo(outputDir)
     }

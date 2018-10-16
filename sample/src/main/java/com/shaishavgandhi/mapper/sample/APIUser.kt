@@ -6,5 +6,4 @@ import com.shaishavgandhi.mapper.Mapper
 data class APIUser(
   val name: String,
   val whatever: Int
-) {
-}
+)
