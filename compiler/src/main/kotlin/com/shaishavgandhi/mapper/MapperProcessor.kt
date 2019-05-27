@@ -98,7 +98,7 @@ class MapperProcessor: AbstractProcessor() {
           .returns(classValue?.asTypeName()!!)
           .addCode(codeBlockBuilder.build())
           .build())
-      file.build().writeTo(outputDir)
+//      file.build().writeTo(outputDir)
     }
     return true
   }
